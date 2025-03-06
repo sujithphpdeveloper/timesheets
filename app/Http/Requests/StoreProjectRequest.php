@@ -27,6 +27,8 @@ class StoreProjectRequest extends FormRequest
             'attributes_values' => 'array',
             'attributes_values.*.attribute_id' => 'required|exists:attributes,id',
             'attributes_values.*.value' => 'required',
+            'users' => 'nullable|array',
+            'users.*' => 'exists:users,id',
         ];
     }
 }

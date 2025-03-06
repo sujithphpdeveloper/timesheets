@@ -17,7 +17,7 @@ class ProjectController extends Controller
      */
     public function index(Request $request, ProjectFilter $filter)
     {
-        $projects = Project::with('attributes');
+        $projects = Project::with('attributeValues.attribute');
         $projects = $filter->apply($projects)->get();
         return ProjectResource::collection($projects);
     }
@@ -27,7 +27,15 @@ class ProjectController extends Controller
      */
     public function store(StoreProjectRequest $request)
     {
+
+        // Creating the project
         $project = Project::create($request->validated());
+
+        // Adding the Users to the project including the authenticated User
+        $userIds = $request->input('users', []);
+        $userIds[] = auth()->id();
+
+        $project->users()->sync(array_unique($userIds));
 
         // Update the attributes if available in the request
         if ($request->has('attributes_values')) {
@@ -44,7 +52,7 @@ class ProjectController extends Controller
             }
         }
 
-        return new ProjectResource($project);
+        return new ProjectResource($project->load('users', 'timesheets.user', 'attributeValues.attribute'));
     }
 
     /**
@@ -52,7 +60,7 @@ class ProjectController extends Controller
      */
     public function show(Project $project)
     {
-        return new ProjectResource($project);
+        return new ProjectResource($project->load('users', 'timesheets.user', 'attributeValues.attribute'));
     }
 
     /**
@@ -61,6 +69,11 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project)
     {
         $project->update($request->validated());
+
+        // Updating the new users list with authenticated user
+        $userIds = $request->input('users', []);
+        $userIds[] = auth()->id();
+        $project->users()->sync(array_unique($userIds));
 
         // crate/update dynamic attributes to project
         if ($request->has('attributes_values')) {
@@ -75,7 +88,7 @@ class ProjectController extends Controller
             }
         }
 
-        return new ProjectResource($project);
+        return new ProjectResource($project->load('users'));
     }
 
     /**

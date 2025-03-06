@@ -26,6 +26,8 @@ class UpdateUserRequest extends FormRequest
             'last_name' => 'sometimes|string|max:255',
             'email' => 'sometimes|email|unique:users,email,' . $this->user->id,
             'password' => 'nullable|string|min:8|confirmed',
+            'users' => 'nullable|array',
+            'users.*' => 'exists:users,id',
         ];
     }
 }

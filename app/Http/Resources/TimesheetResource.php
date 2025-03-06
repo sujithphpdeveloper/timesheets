@@ -19,8 +19,8 @@ class TimesheetResource extends JsonResource
             'task_name' => $this->task_name,
             'date' => $this->date,
             'hours' => $this->hours,
-            'user' => new UserResource($this->user),
-            'project' => new ProjectResource($this->project),
+            'user' => new UserResource($this->whenLoaded('user')),
+            'project' => new ProjectResource($this->whenLoaded('project')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

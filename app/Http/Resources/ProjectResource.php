@@ -20,14 +20,26 @@ class ProjectResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'attributes' => $this->attributeValues->map(function ($attributeValue) {
-                return [
-                    'id'    => $attributeValue->attribute->id,
-                    'name'  => $attributeValue->attribute->name,
-                    'type'  => $attributeValue->attribute->type,
-                    'value' => $attributeValue->value,
-                ];
+            'users' => UserResource::collection($this->whenLoaded('users')),
+            'timesheets' => TimesheetResource::collection($this->whenLoaded('timesheets')),
+            'attributes' => $this->whenLoaded('attributeValues', function () {
+                return $this->attributeValues->map(function ($attributeValue) {
+                    return [
+                        'id'    => $attributeValue->attribute->id,
+                        'name'  => $attributeValue->attribute->name,
+                        'type'  => $attributeValue->attribute->type,
+                        'value' => $attributeValue->value,
+                    ];
+                });
             }),
+//            'attributes' => $this->attributeValues->map(function ($attributeValue) {
+//                return [
+//                    'id'    => $attributeValue->attribute->id,
+//                    'name'  => $attributeValue->attribute->name,
+//                    'type'  => $attributeValue->attribute->type,
+//                    'value' => $attributeValue->value,
+//                ];
+//            }),
         ];
     }
 }

@@ -79,9 +79,7 @@ class ProjectFilter
                         $subQuery->where('name', $field);
                     })->where('value', $operator, $operator === 'LIKE' ? "%{$value}%" : $value);
                 });
-//                $subQuery->whereHas('attribute', function ($subQuery) use ($field, $value, $operator) {
-//                    $subQuery->where('name', $field);
-//                })->where('value', $operator, $operator === 'LIKE' ? "%{$value}%" : $value);
+
             });
         }
     }
