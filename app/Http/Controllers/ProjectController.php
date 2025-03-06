@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
 use App\Models\Attribute;
 use App\Models\Project;
+use App\Filters\ProjectFilter;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -14,9 +15,10 @@ class ProjectController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request, ProjectFilter $filter)
     {
-        $projects = Project::with('attributes')->get();
+        $projects = Project::with('attributes');
+        $projects = $filter->apply($projects)->get();
         return ProjectResource::collection($projects);
     }
 
