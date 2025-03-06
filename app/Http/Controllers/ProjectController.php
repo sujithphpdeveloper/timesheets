@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreProjectRequest;
 use App\Http\Requests\UpdateProjectRequest;
 use App\Http\Resources\ProjectResource;
+use App\Models\Attribute;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
@@ -15,7 +16,8 @@ class ProjectController extends Controller
      */
     public function index()
     {
-        return ProjectResource::collection(Project::all());
+        $projects = Project::with('attributes')->get();
+        return ProjectResource::collection($projects);
     }
 
     /**
@@ -24,6 +26,22 @@ class ProjectController extends Controller
     public function store(StoreProjectRequest $request)
     {
         $project = Project::create($request->validated());
+
+        // Update the attributes if available in the request
+        if ($request->has('attributes_values')) {
+            foreach ($request->attributes_values as $attributeValue) {
+                $attribute = Attribute::find($attributeValue['attribute_id']);
+
+                if($attribute) {
+                    $project->attributeValues()->create([
+                        'attribute_id' => $attribute->id,
+                        'value'        => $attributeValue['value'],
+                    ]);
+
+                }
+            }
+        }
+
         return new ProjectResource($project);
     }
 
@@ -41,6 +59,20 @@ class ProjectController extends Controller
     public function update(UpdateProjectRequest $request, Project $project)
     {
         $project->update($request->validated());
+
+        // crate/update dynamic attributes to project
+        if ($request->has('attributes_values')) {
+            foreach ($request->input('attributes_values') as $attributeValue) {
+                $attribute = Attribute::find($attributeValue['attribute_id']);
+                if ($attribute) {
+                    $project->attributeValues()->updateOrCreate(
+                        ['attribute_id' => $attribute->id],
+                        ['value' => $attributeValue['value']]
+                    );
+                }
+            }
+        }
+
         return new ProjectResource($project);
     }
 

@@ -24,6 +24,9 @@ class UpdateProjectRequest extends FormRequest
         return [
             'name' => 'sometimes|string|max:255',
             'status' => 'sometimes|boolean',
+            'attributes_values' => 'sometimes|array',
+            'attributes_values.*.attribute_id' => 'required|exists:attributes,id',
+            'attributes_values.*.value' => 'required',
         ];
     }
 }

@@ -20,6 +20,14 @@ class ProjectResource extends JsonResource
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            'attributes' => $this->attributeValues->map(function ($attributeValue) {
+                return [
+                    'id'    => $attributeValue->attribute->id,
+                    'name'  => $attributeValue->attribute->name,
+                    'type'  => $attributeValue->attribute->type,
+                    'value' => $attributeValue->value,
+                ];
+            }),
         ];
     }
 }

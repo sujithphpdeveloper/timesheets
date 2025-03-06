@@ -16,4 +16,9 @@ class AttributeValue extends Model
     {
         return $this->belongsTo(Attribute::class);
     }
+
+    public function project()
+    {
+        return $this->belongsTo(Project::class, 'entity_id');
+    }
 }
