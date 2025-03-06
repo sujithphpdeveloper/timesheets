@@ -30,4 +30,14 @@ class UserFactory extends Factory
             'password' => static::$password ??= Hash::make('password'),
         ];
     }
+
+    public function testUser()
+    {
+        return $this->state(fn (array $attributes) => [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+        ]);
+    }
 }

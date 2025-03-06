@@ -30,7 +30,7 @@ class TimesheetController extends Controller
     public function store(StoreTimesheetRequest $request)
     {
         $timesheet = Timesheet::create($request->validated());
-        return new TimesheetResource($timesheet);
+        return new TimesheetResource($timesheet->load('user', 'project'));
     }
 
     /**
@@ -38,7 +38,7 @@ class TimesheetController extends Controller
      */
     public function show(Timesheet $timesheet)
     {
-        return new TimesheetResource($timesheet);
+        return new TimesheetResource($timesheet->load('user', 'project'));
     }
 
     /**
@@ -48,7 +48,7 @@ class TimesheetController extends Controller
     public function update(UpdateTimesheetRequest $request, Timesheet $timesheet)
     {
         $timesheet->update($request->validated());
-        return new TimesheetResource($timesheet);
+        return new TimesheetResource($timesheet->load('user', 'project'));
     }
 
     /**
