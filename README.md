@@ -56,6 +56,7 @@ Run the seed if you want to populate the database with dummy data
 ```bash
 php artisan db:seed
 ```
+
 ## 5. Set File Permissions
 
 Make sure the web server have the enough permission for the laravel recommended folders
@@ -79,6 +80,10 @@ Test the API endpoints using Postman or any other API testing tool. For detailed
 Make sure the Laravel Passport is installed for the authentication
 ```bash
 php artisan passport:install
+```
+Passport is installed and facing issue with Personal Access Client after migration, then create the client
+```bash
+php artisan passport:client --personal
 ```
 
 ---

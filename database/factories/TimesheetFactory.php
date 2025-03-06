@@ -18,12 +18,20 @@ class TimesheetFactory extends Factory
      */
     public function definition(): array
     {
+        $project = Project::has('users')->inRandomOrder()->first();
+
+        if (!$project) {
+            return []; // No valid project found, return an empty array (prevents errors)
+        }
+
+        $user = $project->users()->inRandomOrder()->first();
+
         return [
-            'user_id' => User::inRandomOrder()->first()->id,
-            'project_id' => Project::inRandomOrder()->first()->id,
+            'user_id' => $user->id,
+            'project_id' => $project->id,
             'task_name' => fake()->sentence(4),
             'date' => fake()->dateTimeThisYear('now'),
-            'hours' => fake()->numberBetween(1,7),
+            'hours' => fake()->numberBetween(1,24),
         ];
     }
 }
