@@ -39,6 +39,7 @@ class ProjectFilter
         return in_array($field, ['created_at', 'updated_at']);
     }
 
+
     private function applyFilter(Builder $query, $field, $value, $operator): void
     {
         // Only allowed the predefined operations
@@ -46,24 +47,41 @@ class ProjectFilter
             return;
         }
 
-        if ($this->isDateField($field)) {
-            try {
-                // Convert the date value in to string
-                $value = Carbon::parse($value)->toDateString();
-            } catch (\Exception $e) {
-                return;
-            }
-        }
-
         if (in_array($field, $this->projectFields)) {
+            if ($this->isDateField($field)) {
+                try {
+                    // Convert the date value in to string
+                    $value = Carbon::parse($value)->toDateString();
+                } catch (\Exception $e) {
+                    return;
+                }
+            }
+
             // These query only will work for the Project fields
             $query->where($field, $operator, $operator === 'LIKE' ? "%{$value}%" : $value);
         } else {
             // Here the query will do on the attributes
             $query->whereHas('attributeValues', function ($subQuery) use ($field, $value, $operator) {
-                $subQuery->whereHas('attribute', function ($subQuery) use ($field, $value, $operator) {
-                    $subQuery->where('name', $field);
-                })->where('value', $operator, $operator === 'LIKE' ? "%{$value}%" : $value);;
+                $subQuery->where(function ($subQuery) use ($field, $value, $operator) {
+                    try {
+                        // Convert the date value in to string
+                        $value = Carbon::parse($value)->toDateString();
+                    } catch (\Exception $e) {
+                        return;
+                    }
+
+                    $subQuery->whereHas('attribute', function ($subQuery) use ($field, $value, $operator) {
+                        $subQuery->where('name', $field)->where('type', 'date');
+                    })->where('value', $operator, $value);
+
+                })->orWhere(function ($subQuery) use ($field, $value, $operator) {
+                    $subQuery->whereHas('attribute', function ($subQuery) use ($field, $value, $operator) {
+                        $subQuery->where('name', $field);
+                    })->where('value', $operator, $operator === 'LIKE' ? "%{$value}%" : $value);
+                });
+//                $subQuery->whereHas('attribute', function ($subQuery) use ($field, $value, $operator) {
+//                    $subQuery->where('name', $field);
+//                })->where('value', $operator, $operator === 'LIKE' ? "%{$value}%" : $value);
             });
         }
     }
